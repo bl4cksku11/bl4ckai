@@ -74,6 +74,6 @@ or ruled out), tick the `OS command influence check` box for this host in `$ENG/
 
 ```markdown
 ### POST /convert {filename}  — CONFIRMED (OOB)
-filename=x$(curl OOB).png triggered DNS+HTTP callback from the server IP → command
+filename=x$(<oob-callback-host>).png triggered DNS+HTTP callback from the server IP → command
 influence. Stopped at callback; handed to operator. Evidence: .../evidence/acme-cmd-oob.txt
 ```

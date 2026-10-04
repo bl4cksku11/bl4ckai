@@ -21,6 +21,7 @@ and are never committed or sent anywhere but the target.
 : "${BL4CKAI_HOME:?}"; [ -f "$BL4CKAI_HOME/config.sh" ] && . "$BL4CKAI_HOME/config.sh"
 export ENG="$ENGAGEMENTS_ROOT/A/<target>"
 ID="$BL4CKAI_HOME/.claude/skills/test-identity/identity.sh"
+REQ="$BL4CKAI_HOME/.claude/skills/scope-gate/req.sh"
 ```
 
 ## 1. The operator provisions the accounts (human-in-the-loop)
@@ -34,7 +35,8 @@ exists.
 ## 2. Register each session here
 
 Capture each account's on-the-wire auth (the `Cookie:` or `Authorization:` header
-from a logged-in request in proxy history / the browser) and store it by name:
+from a logged-in request in proxy history / the browser) and store it by name. The
+third argument onward is the exact header line:
 
 ```bash
 bash "$ID" set A     user  "Cookie: session=<A's cookie>"
@@ -46,15 +48,17 @@ bash "$ID" list
 
 ## 3. Checks pull identities by name
 
-An access-control check acts as one account while holding another's identifier:
+An access-control check acts as one account while holding another's identifier. All
+target traffic goes through `req.sh` (scope + header + rate enforced), never raw
+curl:
 
 ```bash
 A_HDR=$(bash "$ID" get A)      # e.g. "Cookie: session=..."
-# baseline as A on A's own object, then as A on B's object id, then anon:
-# curl -s -H "$A_HDR" -H "$RESEARCH_HEADER" "https://$HOST/api/orders/<B's id>"
+# baseline as A on A's own object, then as A on B's object id:
+bash "$REQ" -H "$A_HDR" "https://$HOST/api/orders/<B's id>"
 ```
 
-Pass `RESEARCH_HEADER` too, and resolve `$HOST` through `scope-gate` first.
+Resolve `$HOST` through `scope-gate` first (req.sh also enforces it).
 
 ## 4. Keep sessions fresh
 

@@ -19,10 +19,17 @@ url=""; for a in "$@"; do case "$a" in http://*|https://*) url="$a"; break;; esa
 [ -z "$url" ] && { echo "req.sh: no URL in args" >&2; exit 2; }
 host="${url#*://}"; host="${host%%/*}"; host="${host%%:*}"
 
-# 1) SCOPE
+# 0) FAIL-CLOSED: never follow redirects blindly — a 3xx to another host must be
+# re-gated by the caller, not auto-fetched out of scope.
+for a in "$@"; do case "$a" in -L|--location) echo "req.sh: refusing -L; gate the redirect Location yourself" >&2; exit 2;; esac; done
+
+# 1) SCOPE — only an explicit IN (rc 0) proceeds. Missing/empty/malformed scope,
+# a crashed gate, an unknown verdict → BLOCK. Default-deny.
 verdict=$(bash "$GATE" "$host" 2>/dev/null); rc=$?
-if [ $rc -eq 1 ]; then echo "REFUSED (out of scope): $host — $verdict" >&2; exit 3; fi
-if [ $rc -eq 2 ]; then echo "ASK (scope unclear): $host — confirm with operator before sending" >&2; exit 2; fi
+if [ "$rc" -ne 0 ]; then
+  echo "BLOCKED (fail-closed): $host — ${verdict:-gate error} (rc=$rc)" >&2
+  exit 3
+fi
 
 # 3) RATE — global min interval = 1/MAX_RPS, enforced via a timestamp lockfile
 RL="$ENG/.rate"; mkdir -p "$RL"; lock="$RL/last"

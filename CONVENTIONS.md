@@ -240,3 +240,22 @@ find it: `<slug>.req` / `<slug>.resp` (the request/response pair), `<slug>.png`
 proof). A check note and a finding reference evidence by full path. Capture the
 proof at the moment of confirmation — not reconstructed later — and keep it to what
 demonstrates the issue on owned accounts.
+
+## 15. No naked network egress — enforced in review
+
+All traffic to a target goes through `req.sh` (manual requests) or a bulk tool
+invoked with BOTH a scope-filtered input list AND a rate flag (`-rl`/`-rate`). No
+skill emits a naked `curl`/`wget`/`python-requests`/`httpx`/`nuclei` at the target.
+Third-party passive services (CT logs, wayback, OOB listeners, tool installers) are
+exempt — they are not the target.
+
+`req.sh` is fail-closed: only an explicit in-scope verdict proceeds; missing, empty,
+or malformed scope, a crashed gate, or an unknown verdict all BLOCK. It refuses
+`-L` so a redirect cannot pull traffic out of scope unseen — the caller re-gates the
+`Location` itself.
+
+A harness cannot guarantee this at runtime without a network sandbox, so the
+backstop is review: `scripts/lint_skills.sh` greps every skill for egress that
+bypasses the wrapper. ERROR (naked egress) must be zero before publishing; WARN
+(a bulk tool with no rate flag nearby) is advisory and includes multi-line false
+positives — glance and move on. Run it in CI.

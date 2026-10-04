@@ -37,13 +37,15 @@ wc -l < "$ENG/recon/js_in_scope.txt"
 
 One request per script, spaced to stay under `MAX_RPS`, carrying the program header.
 
+`req.sh` enforces scope + the program header + `MAX_RPS` pacing on each fetch, so
+the loop stays simple. Note the single-quoted job command to avoid nested quoting.
+
 ```bash
-bash "$JOB" run js-fetch "Fetch in-scope JS bodies (paced, header)" \
-  "delay=\$(awk 'BEGIN{print 1/${MAX_RPS:-5}}'); i=0
-   while read -r u; do i=\$((i+1));
-     curl -s --max-time 15 -H '$RESEARCH_HEADER' -A 'Mozilla/5.0' \"\$u\" \
-       -o \"$ENG/recon/js/\$i.js\"; sleep \$delay; done < '$ENG/recon/js_in_scope.txt'
-   echo fetched \$i scripts"
+bash "$JOB" run js-fetch 'Fetch in-scope JS bodies (via req.sh: scope+header+rate)' \
+  'REQ="$BL4CKAI_HOME/.claude/skills/scope-gate/req.sh"; i=0
+   while read -r u; do i=$((i+1));
+     bash "$REQ" -A Mozilla/5.0 --max-time 15 "$u" -o "$ENG/recon/js/$i.js" 2>/dev/null
+   done < "$ENG/recon/js_in_scope.txt"; echo "fetched $i scripts"'
 bash "$JOB" status js-fetch     # watch it; big sites take a while
 ```
 

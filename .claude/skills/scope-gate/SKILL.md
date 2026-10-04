@@ -48,6 +48,10 @@ when the operator clarifies scope, update the file.
 
 - `*.acme.com` matches subdomains (`api.acme.com`) but NOT the bare apex
   `acme.com` — if the apex is in scope, add it as its own line, or it resolves ASK.
+- NEVER use a trailing wildcard like `acme.com*` — it matches `acme.com.evil.com`.
+  Use the prefix form `*.acme.com` (suffix-anchored, verified safe against
+  `acme.com.evil.com` / `notacme.com` lookalikes → they resolve ASK, not IN) and
+  list the apex `acme.com` as its own exact line.
 - Precedence is deny-wins (verified): a host matching both an allow glob and a `-`
   deny is OUT. So `*.acme.com` + `-admin.acme.com` keeps `admin.acme.com` out.
 - Out-of-scope is a first-class, recorded outcome — it is not an error. Write it to
