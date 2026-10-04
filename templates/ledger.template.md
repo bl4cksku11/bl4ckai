@@ -44,6 +44,7 @@ done = re-run. `progress-review` verifies ticks against disk.
 
   ### cross-account-order-access
   - [ ] Duplicate assessment → `.../reports/cross-account-order-access_dedup.md`
+  - [ ] Triage verdict VALID/VALID-DOWNGRADED → `.../reports/cross-account-order-access_triage.md`
   - [ ] Report draft written by agent → `.../reports/cross-account-order-access.md`
   - [ ] Vault mirror written (only if VAULT_ROOT set) → `$VAULT_ROOT/<bbp|vdp>/<program>/cross-account-order-access.md`
   - [ ] Operator validated this finding and approved submission

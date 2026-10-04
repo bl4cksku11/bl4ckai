@@ -26,6 +26,7 @@ technique skills   → one observable behavior each, per surface  (read KB first
       ↓          ↖──────── strategy-refresh re-prioritizes the queue every ~5 checks
 on each confirmed result:
   dedup-check      → novel / variant / duplicate verdict
+  finding-triage   → skeptical gate: reproduce, hunt the kill, re-score → VALID/INVALID
   finding-draft    → agent writes the full draft + vault mirror  (status: draft)
       ↓
 progress-review    → verify every ledger box against disk, re-queue gaps
@@ -151,6 +152,7 @@ Same pattern as web: bite-size, KB-optional, ledger-backed, confirm→dedup→dr
 | Skill | Job |
 |---|---|
 | `dedup-check` | Compare a confirmed result against the operator's history + program disclosures; verdict novel/variant/duplicate |
+| `finding-triage` | Skeptical gate before drafting: independent repro, verify every claim, hunt the guard that kills it, re-score; verdict VALID/VALID-DOWNGRADED/NEEDS-EVIDENCE/INVALID |
 | `finding-draft` | Agent writes the full draft from notes+evidence, mirrors to the vault; leaves it `status: draft` for operator validation |
 | `strategy-refresh` | The self-adjusting pass: record lessons, re-prioritize the queue, expand it from observation triggers |
 

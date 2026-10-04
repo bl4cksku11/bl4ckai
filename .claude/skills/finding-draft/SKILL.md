@@ -6,8 +6,10 @@ description: Turn a confirmed, non-duplicate result into a complete write-up. Th
 # Finding draft
 
 The agent writes the full report. This is agent work, not operator work — the
-operator reviews and validates afterward. Runs after `dedup-check` returns NOVEL or
-VARIANT. The draft stays `status: draft` and is never submitted or sent to the
+operator reviews and validates afterward. Runs only after `finding-triage` returns **VALID** or **VALID-DOWNGRADED** (and
+`dedup-check` cleared it). If triage said INVALID or NEEDS-EVIDENCE, there is
+nothing to draft — do not write one. Use the triage note's corrected severity,
+not the original claim. The draft stays `status: draft` and is never submitted or sent to the
 program by this skill.
 
 ## Set up paths
