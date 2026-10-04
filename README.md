@@ -88,6 +88,8 @@ table is the decoder ring; keep it current as skills are added.
 ### Built — cross-domain / setup skills
 | Skill | Plain name / what it is |
 |---|---|
+| `scope-gate` | Resolve a host against the engagement scope (in/out/ask) before any traffic — the authorization gate every network skill calls first |
+| `test-identity` | Provision + track the separate live accounts (A/B/anon/admin) that access-control checks need to actually confirm |
 | `tool-setup` | Install + verify the CLI programs an engagement needs, logged (sets: core/web-full/review/fuzzing, plus `interceptor`) |
 | `job-runner` | Run long steps in the background with status in a file the operator can read anytime (running/done/failed/stalled) |
 | `browser-interactor` | Web backend A — drive the operator's signed-in browser + inspect its traffic via Interceptor (authenticated web + live requests) |

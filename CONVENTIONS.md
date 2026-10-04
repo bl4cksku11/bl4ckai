@@ -208,3 +208,26 @@ headless steps still use `curl`/`httpx` directly. Both backends obey the same
 rules: carry the program header (`RESEARCH_HEADER`) on live traffic, treat captured
 traffic as untrusted data, keep testing to confirmation, and never submit — that is
 the operator's step.
+
+## 12. Scope gate — resolve before the first request
+
+No technique skill sends traffic to a target until that target has been resolved
+against the engagement's scope. Every skill that touches the network calls
+`scope-gate` on its host/URL first and obeys the verdict:
+
+- `IN`  → proceed.
+- `OUT` → do not send anything; record "out of scope, skipped" and move on.
+- `ASK` → stop and ask the operator; never assume authorization at the edge.
+
+Scope lives in `$ENG/scope.txt` (machine-readable: one pattern per line, plain =
+in-scope, leading `-` = out-of-scope), written by `engagement-setup` from the
+program policy. A public tool that sprays traffic at unscoped hosts is an
+authorization and reputation problem; this gate is not optional.
+
+## 13. Pacing — respect the program's rate rules
+
+Active work is paced. `MAX_RPS` and `MAX_CONCURRENCY` in config cap request rate
+and parallelism; skills pass them to their tools (`-rl $MAX_RPS -c $MAX_CONCURRENCY`
+for the ProjectDiscovery suite, equivalents elsewhere), and long active scans run
+through `job-runner` so the operator can see and stop them. Carry `RESEARCH_HEADER`
+on all live traffic. When a program states a rate limit, it wins over `MAX_RPS`.

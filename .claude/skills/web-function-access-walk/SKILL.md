@@ -10,6 +10,9 @@ from the surface list in `02_strategy.md`. Stay in scope. This skill tests and
 records only — it never drafts, submits, or contacts the program. A confirmed
 result is handed to the operator and the finding path.
 
+
+> **Before any request:** resolve `$HOST` through `scope-gate`, and for a cross-account/role test pull the two live sessions from `test-identity` (`identity.sh get A` / `get B`; `anon` = no auth header). A check with only one identity cannot confirm an access-control finding.
+
 ## 1. Set up paths and read any configured reference notes first
 
 ```bash

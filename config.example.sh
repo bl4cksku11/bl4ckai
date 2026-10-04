@@ -50,3 +50,8 @@ export RESEARCH_HEADER="${RESEARCH_HEADER:-}"               # program header add
 #   auto        = prefer burp if its MCP is reachable, else interceptor
 export WEB_BACKEND="${WEB_BACKEND:-auto}"
 export BURP_MCP_URL="${BURP_MCP_URL:-http://127.0.0.1:9876/sse}"   # Burp MCP server (BApp: "MCP Server")
+
+# --- Pacing & scope (safety) -------------------------------------------------
+export MAX_RPS="${MAX_RPS:-5}"        # cap requests/sec for active jobs; programs often set rate rules
+export MAX_CONCURRENCY="${MAX_CONCURRENCY:-10}"
+# Scope is captured per engagement in $ENG/scope.txt (patterns: plain=in-scope, '-'=out).

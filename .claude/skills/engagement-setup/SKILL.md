@@ -50,6 +50,27 @@ Fetch the policy URL and extract, into `$ENG/00_program_brief.md`:
 - Any "areas of focus" the program names — note these, they are underexplored
 - Disclosure and duplicate-handling rules
 
+### 3b. Write the machine-readable scope file (required — `scope-gate` reads it)
+
+Turn the scope into `$ENG/scope.txt`: one hostname pattern per line, plain =
+in-scope, leading `-` = out-of-scope. Globs allowed. Every network-touching skill
+checks a host against this before sending traffic (CONVENTIONS §12).
+
+```bash
+cat > "$ENG/scope.txt" <<'SCOPE'
+# in-scope (allow)
+*.acme.com
+api.acme.io
+# out-of-scope (deny — deny wins over allow)
+-blog.acme.com
+-*.marketing.acme.com
+SCOPE
+```
+
+Only write patterns the policy actually authorizes. If scope is "open / all owned
+assets", still list the known apexes here and leave genuinely-unknown hosts to
+resolve as `ASK` at test time rather than blanket-allowing `*`.
+
 ### 4. List the knowledge base topics
 
 So later skills know what reference material exists. Append to the brief:
