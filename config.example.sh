@@ -41,7 +41,6 @@ export RECON_INSTALL="${RECON_INSTALL:-}"
 export INTERCEPTOR_BIN="${INTERCEPTOR_BIN:-}"               # path to the interceptor binary; empty = not installed
 export INTERCEPTOR_MCP_ALLOW="${INTERCEPTOR_MCP_ALLOW:-}"   # empty = read+mutate only (safe). add destructive/raw to opt in
 export INTERCEPTOR_MCP_FENCE="${INTERCEPTOR_MCP_FENCE:-on}" # wrap captured page/network content as untrusted data
-export RESEARCH_HEADER="${RESEARCH_HEADER:-}"               # program header added to live traffic, e.g. "X-HackerOne-Research: <handle>"
 
 # --- Web interaction backend (pick one; both are optional) -------------------
 # How authenticated web interaction + live traffic inspection is driven:
@@ -51,7 +50,11 @@ export RESEARCH_HEADER="${RESEARCH_HEADER:-}"               # program header add
 export WEB_BACKEND="${WEB_BACKEND:-auto}"
 export BURP_MCP_URL="${BURP_MCP_URL:-http://127.0.0.1:9876/}"   # Burp MCP server (BApp: "MCP Server")
 
-# --- Pacing & scope (safety) -------------------------------------------------
+# --- Pacing, header & scope (applies to ALL live traffic, any backend) -------
+# req.sh injects this header on every request to the target, and both web backends
+# carry it too. Many programs REQUIRE it (e.g. Aegean: "X-HackerOne-Research: <h1>").
+# Empty = no header is added — set it before any authenticated/active work.
+export RESEARCH_HEADER="${RESEARCH_HEADER:-}"   # e.g. "X-HackerOne-Research: <your-handle>"
 export MAX_RPS="${MAX_RPS:-5}"        # cap requests/sec for active jobs; programs often set rate rules
 export MAX_CONCURRENCY="${MAX_CONCURRENCY:-10}"
 # Scope is captured per engagement in $ENG/scope.txt (patterns: plain=in-scope, '-'=out).
