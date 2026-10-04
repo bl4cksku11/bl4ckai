@@ -94,6 +94,8 @@ table is the decoder ring; keep it current as skills are added.
 | `job-runner` | Run long steps in the background with status in a file the operator can read anytime (running/done/failed/stalled) |
 | `browser-interactor` | Web backend A — drive the operator's signed-in browser + inspect its traffic via Interceptor (authenticated web + live requests) |
 | `burp-driver` | Web backend B — drive Burp Suite Pro via its MCP (`mcp__burpsuite__*`): replay requests, proxy history, Intruder, Collaborator OOB. Pick via `WEB_BACKEND` |
+| `known-cve-check` | Turn the recon fingerprint into n-day findings with a paced, safe-template scanner (nuclei), scope-gated |
+| `js-analysis` | Fetch in-scope client-side scripts and mine them for hidden endpoints + leaked secrets |
 | `url-mining` | Offline: turn bulk recon URLs into parameters, API endpoints, and per-host target lists (no new traffic) |
 
 ### Built — web technique skills (one behavior each)
