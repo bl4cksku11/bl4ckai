@@ -59,6 +59,15 @@ when the operator clarifies scope, update the file.
 - This gate is about authorization, not reachability; a host can be in scope and
   down. Pair with recon, not instead of it.
 
+## The decision log (read it on a real run)
+
+Every verdict — IN, OUT, and ASK — is appended to `$ENG/evidence/scope_decisions.log` with the host and the exact rule that
+fired, for direct calls and for traffic through `req.sh` alike. On a target
+with hundreds of hosts and redirects this trail is how you catch scope
+mistakes after the fact: grep it for `ASK ` to find surface you excluded too
+narrowly (a host that should have been IN), and skim `IN ` to be sure nothing
+resolved in-scope that should not have. Format: `<ts>\t<VERDICT> <host> (<rule>)`.
+
 ## Example of good output
 
 ```

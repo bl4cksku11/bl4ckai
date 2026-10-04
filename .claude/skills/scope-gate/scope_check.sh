@@ -12,7 +12,17 @@ arg="${1:?usage: scope_check.sh <host-or-url>}"
 host="$arg"; host="${host#*://}"; host="${host%%/*}"; host="${host%%:*}"; host="${host%%\?*}"
 host="$(printf '%s' "$host" | tr '[:upper:]' '[:lower:]')"
 
-if [ ! -f "$SCOPE" ]; then echo "ASK  $host  (no scope.txt — run engagement-setup)"; exit 2; fi
+# Record EVERY verdict (with the rule that fired) to a per-engagement decision log,
+# then print and exit. On a real run this trail is how you catch an ASK that should
+# have been IN (scope too narrow → lost surface) or an IN that should have been OUT
+# (the expensive case). Every caller — req.sh or a direct call — goes through here.
+decide(){ # <verdict-line> <exit-code>
+  if [ -n "${ENG:-}" ]; then mkdir -p "$ENG/evidence" 2>/dev/null
+    printf '%s\t%s\n' "$(date +%FT%T)" "$1" >> "$ENG/evidence/scope_decisions.log"; fi
+  echo "$1"; exit "$2"
+}
+
+if [ ! -f "$SCOPE" ]; then decide "ASK  $host  (no scope.txt — run engagement-setup)" 2; fi
 
 matches(){ case "$1" in $2) return 0;; *) return 1;; esac; }
 
@@ -26,6 +36,6 @@ while IFS= read -r line; do
   esac
 done < "$SCOPE"
 
-if [ -n "$deny" ];  then echo "OUT  $host  (matches -$deny)"; exit 1; fi
-if [ -n "$allow" ]; then echo "IN   $host  (matches $allow)"; exit 0; fi
-echo "ASK  $host  (no in-scope pattern matched — confirm with operator)"; exit 2
+if [ -n "$deny" ];  then decide "OUT  $host  (matches -$deny)" 1; fi
+if [ -n "$allow" ]; then decide "IN   $host  (matches $allow)" 0; fi
+decide "ASK  $host  (no in-scope pattern matched — confirm with operator)" 2
