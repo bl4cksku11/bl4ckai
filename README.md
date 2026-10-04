@@ -64,7 +64,7 @@ Nothing is hardcoded to one machine — paths come from config.
 ## Where things live
 
 - Skills: `$BL4CKAI_HOME/.claude/skills/<name>/SKILL.md`
-- Templates: `$BL4CKAI_HOME/templates/`
+- Templates: `$BL4CKAI_HOME/templates/` (incl. `technique_menu.md` + `technique_menu_verticals.md` — canonical ledger labels)
 - Tooling notes: `$BL4CKAI_HOME/docs/tooling.md`
 - Engagement output (filed A–Z by target): `$ENGAGEMENTS_ROOT/{A-Z}/{target}/`
 - Reference library (optional, per-user): `$KB_ROOT`

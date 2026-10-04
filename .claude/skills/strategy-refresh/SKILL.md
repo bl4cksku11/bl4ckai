@@ -77,7 +77,7 @@ Add new tasks the observations justify. Triggers (reason about why each matters
   boundary issue plus a shared cache? Queue the chain explicitly as its own task.
 
 For each new task set `origin` (recon | inference | lesson:Lxxx | manual) and the
-`skill` that performs it, using the names from `README.md`.
+`skill` that performs it, using the names from `README.md`. For the canonical ledger label + output file of each check (so a seeded line matches what the skill ticks), copy from `$BL4CKAI_HOME/templates/technique_menu.md` (web) or `$BL4CKAI_HOME/templates/technique_menu_verticals.md` (mobile/source/api/cloud/ai/contract/hardware).
 
 ## 5. Rewrite the plan and tell the operator
 
