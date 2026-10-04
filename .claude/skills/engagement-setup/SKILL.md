@@ -1,181 +1,95 @@
 ---
 name: engagement-setup
-description: Start a new assessment workspace from a program's policy page. Reads the program's scope and rules, creates the per-target folder tree, and initializes the progress ledger and task queue. Run this first.
+description: Set up a new assessment from a program's pasted policy and scope. The operator pastes the program information into the chat; you (the agent) read it and fill the whole workspace — scope file, brief, host seed, ledger, task queue — then stop for the operator to confirm scope and the required header. Run this first.
 ---
 
 # Engagement setup
 
-First skill for any new authorized program. It turns a program policy into a
-workspace: a folder tree, a brief, a ledger, and a seeded task queue. Nothing here
+You are the intake agent. The operator pastes a program's information into the chat
+(policy text + the scope/asset table, or a policy URL) and you do the whole setup
+from it — there is no script for the operator to run. Read the pasted text, apply
+judgment, write every artifact, and stop at the two confirmations. Nothing here
 touches the target over the network.
 
-## Inputs you need from the operator
+## What the operator gives you
 
-- Program name and platform (hackerone | bugcrowd | other)
-- Policy / scope URL
-- Confirmation the program authorizes testing (it is in scope on the platform)
+A pasted dump: the program policy and the scope/asset list. Sometimes just a URL —
+if so, fetch it. If scope is genuinely missing, ask; never invent it.
 
-If the policy URL is missing, ask for it. Do not guess scope.
+## What you produce (do all of this from the paste)
 
-## Fast path — paste-and-go (recommended)
-
-The operator rarely wants to run the steps below by hand. Instead: **paste the whole
-program dump** (policy text + the scope/asset table) into a file, and let `intake.py`
-fill the mechanical parts in one shot.
+Set the paths first:
 
 ```bash
 : "${BL4CKAI_HOME:?}"; [ -f "$BL4CKAI_HOME/config.sh" ] && . "$BL4CKAI_HOME/config.sh"
-# 1) save the pasted program info to a file
-$EDITOR /tmp/<slug>_dump.txt          # or: pbpaste > /tmp/<slug>_dump.txt
-# 2) one command fills everything
-python3 "$BL4CKAI_HOME/.claude/skills/engagement-setup/intake.py" \
-   <slug> /tmp/<slug>_dump.txt --program "<Name>" --platform hackerone --type vdp
-```
-
-It writes, under `$ENGAGEMENTS_ROOT/<A-Z>/<slug>/`:
-- `scope.txt` — in-scope apex wildcards + apex, auto-derived from every hostname in
-  the dump (platform/common domains like hackerone.com are filtered out).
-- `recon/subdomains.txt` — every explicit host found, so recon starts seeded.
-- `00_program_dump.txt` — the raw paste, kept as the source of truth.
-- `00_program_brief.md` — header/rate/prohibited/exclusion **hints** pulled from the
-  dump for the operator to confirm (regex never invents the scope boundary).
-- `00_ledger.md`, `_queue.json` — from the templates.
-
-Then the two human-in-the-loop confirmations it prints: **review `scope.txt`** (add
-any `-` exclusions), and **set `RESEARCH_HEADER` + `MAX_RPS`** in config to match the
-brief's hints. On HackerOne note that "Ineligible" means *no bounty*, NOT
-out-of-scope — do not exclude those hosts.
-
-When the operator asks the agent to "set up program X" and pastes the info, the
-agent runs exactly this, then refines the brief's rule summary from the dump.
-
-The steps below are the same work done by hand, for reference or when there is no
-single dump to paste.
-
-## Steps (manual / reference)
-
-### 1. Pick the engagement path
-
-File alphabetically by the first letter of the target slug (a simple A–Z filing
-convention that keeps large numbers of targets navigable).
-
-```bash
-TARGET=acme                 # lowercase slug, no spaces
-LETTER=$(echo "$TARGET" | cut -c1 | tr '[:lower:]' '[:upper:]')
-: "${BL4CKAI_HOME:?set it to the harness repo root, e.g. export BL4CKAI_HOME=~/bl4ckai}"
-[ -f "$BL4CKAI_HOME/config.sh" ] && . "$BL4CKAI_HOME/config.sh"
-ENG="${ENGAGEMENTS_ROOT:-$BL4CKAI_HOME/engagements}/$LETTER/$TARGET"
-echo "Engagement root: $ENG"
-```
-
-### 2. Create the folder tree
-
-```bash
+TARGET=<slug>                     # short lowercase name you choose for the program
+LETTER=$(printf %s "$TARGET" | cut -c1 | tr '[:lower:]' '[:upper:]')
+export ENG="${ENGAGEMENTS_ROOT:-$BL4CKAI_HOME/engagements}/$LETTER/$TARGET"
 mkdir -p "$ENG"/{recon,checks,reports,evidence}
 ```
 
-### 3. Read the policy and write the brief
+1. **Save the raw paste** verbatim to `$ENG/00_program_dump.txt` — it is the source
+   of truth you and later skills re-read.
 
-Fetch the policy URL and extract, into `$ENG/00_program_brief.md`:
+2. **`scope.txt`** — read the scope table and write the authorization boundary, with
+   judgment a regex cannot apply:
+   - Every in-scope hostname → derive the apex and write `*.apex` + `apex`. List
+     unusual exact hosts too.
+   - **Filter out** the platform and infra domains that appear in policies but are
+     not the target (hackerone.com, bugcrowd.com, github.com, the researcher's own
+     profile URL, doc links).
+   - **"Ineligible" on HackerOne means NO BOUNTY, not out of scope** — do NOT exclude
+     those hosts. Only add a `-` deny line for assets the policy actually excludes
+     (marketing sites, third-party, explicitly out-of-scope).
+   - Plain line = in-scope, leading `-` = out-of-scope (deny wins).
 
-- Every in-scope asset (domains, subdomains, IP ranges, apps)
-- Every out-of-scope asset
-- Explicitly excluded finding classes
-- Reward structure → decide `bbp` (pays) vs `vdp` (no pay)
-- Any "areas of focus" the program names — note these, they are underexplored
-- Disclosure and duplicate-handling rules
+3. **`recon/subdomains.txt`** — every explicit in-scope host from the table, one per
+   line. This seeds recon so nothing is lost.
 
-### 3b. Write the machine-readable scope file (required — `scope-gate` reads it)
+4. **`00_program_brief.md`** — the rules that govern every later step, extracted and
+   stated plainly:
+   - Required request header (e.g. `X-HackerOne-Research: <handle>`) and account/alias rule.
+   - Rate / pacing rule if stated.
+   - Hard prohibitions (no DoS, no data access/exfiltration, no social engineering, …).
+   - Excluded finding classes (self-XSS, missing headers, SPF, clickjacking non-sensitive, …).
+   - `bbp` vs `vdp` from the reward language; any program-named "areas of focus".
 
-Turn the scope into `$ENG/scope.txt`: one hostname pattern per line, plain =
-in-scope, leading `-` = out-of-scope. Globs allowed. Every network-touching skill
-checks a host against this before sending traffic (CONVENTIONS §12).
-
-```bash
-cat > "$ENG/scope.txt" <<'SCOPE'
-# in-scope (allow)
-*.acme.com
-api.acme.io
-# out-of-scope (deny — deny wins over allow)
--blog.acme.com
--*.marketing.acme.com
-SCOPE
-```
-
-Only write patterns the policy actually authorizes. If scope is "open / all owned
-assets", still list the known apexes here and leave genuinely-unknown hosts to
-resolve as `ASK` at test time rather than blanket-allowing `*`.
-
-### 4. List the knowledge base topics
-
-So later skills know what reference material exists. Append to the brief:
+5. **`00_ledger.md` and `_queue.json`** from the templates:
 
 ```bash
-if [ -n "${KB_ROOT:-}" ] && [ -d "$KB_ROOT" ]; then
-  { echo; echo "## Reference library topics (KB_ROOT)"; ls "$KB_ROOT"; \
-    [ -d "$KB_ROOT/Web" ] && ls "$KB_ROOT/Web"; } >> "$ENG/00_program_brief.md"
-else
-  echo "(No reference library configured; skills use their built-in method.)" \
-    >> "$ENG/00_program_brief.md"
-fi
+sed -e "s/{{TARGET}}/$TARGET/g" -e "s/{{PROGRAM}}/<Program Name>/g" -e "s/{{PLATFORM}}/<platform>/g" \
+    -e "s/{{bbp|vdp}}/<type>/g" -e "s#{{A-Z}}#$LETTER#g" -e "s/{{DATE}}/$(date +%F)/g" \
+    "$BL4CKAI_HOME/templates/ledger.template.md" > "$ENG/00_ledger.md"
+sed -e "s/{{TARGET}}/$TARGET/g" -e "s/{{PROGRAM}}/<Program Name>/g" \
+    "$BL4CKAI_HOME/templates/queue.template.json" > "$ENG/_queue.json"
 ```
 
-### 5. Initialize the ledger
+Then tick the `## Setup` boxes in the ledger (all four artifacts now exist).
 
-Copy the template and fill the header fields. Leave every box unchecked.
+## Optional accelerator for a huge scope table
 
-```bash
-sed -e "s/{{TARGET}}/$TARGET/g" -e "s/{{DATE}}/$(date +%F)/g" \
-  $BL4CKAI_HOME/templates/ledger.template.md \
-  > "$ENG/00_ledger.md"
+If the pasted table has dozens of hosts, you MAY save the dump and run
+`intake.py <slug> <dumpfile>` to bulk-extract hosts and scaffold the files — but
+it is a blunt regex tool: **verify and correct its `scope.txt` and brief yourself**
+(it cannot tell "Ineligible" from out-of-scope, or a real exclusion from a mention).
+You own the result, not the script.
+
+## Stop here — the two confirmations (human-in-the-loop)
+
+Do not proceed to recon on your own. Show the operator:
+- the `scope.txt` you wrote (the authorization boundary), and
+- the header and rate rule you read from the policy.
+
+Ask them to confirm scope and to set `RESEARCH_HEADER` + `MAX_RPS` in `config.sh` to
+match. Only after they confirm does anything touch the target.
+
+## Example — what you report back after setup
+
 ```
-
-### 6. Initialize the task queue
-
-```bash
-sed -e "s/{{TARGET}}/$TARGET/g" \
-  $BL4CKAI_HOME/templates/queue.template.json \
-  > "$ENG/_queue.json"
-```
-
-Seed the queue with the first real tasks and their priority scores: run `web-recon`,
-then build the strategy, then the per-surface checks the brief points to. Set each
-task's `skill` field to the skill that performs it.
-
-### 7. Tick the Setup boxes
-
-Only after each artifact above exists, edit `$ENG/00_ledger.md` and change the four
-`## Setup` boxes to `- [x]`. Then tell the operator the engagement is set up and
-name the next skill to run (`web-recon`).
-
-## Example of good output — `00_program_brief.md`
-
-```markdown
-# Program brief — acme (hackerone, bbp)
-
-## In scope
-- *.acme.com
-- api.acme.io
-- Acme Android app (com.acme.app)
-
-## Out of scope
-- blog.acme.com (marketing, third-party)
-- Anything matching self-* class exclusions below
-
-## Excluded classes
-- Missing security headers, SPF/DMARC, rate limiting, self-directed only issues,
-  clickjacking on non-sensitive pages
-
-## Rewards
-- critical 5000, high 2000, medium 600, low 150  → type: bbp
-
-## Areas of focus (program-named — prioritize)
-- The new billing workflow under /v2/billing
-- Partner API token exchange
-
-## Duplicate / disclosure
-- First valid reporter. Coordinated disclosure after fix.
-
-## KB topics available
-Web/ ... (list)
+Set up acme (hackerone, bbp) at $ENG
+  scope.txt: *.acme.com, acme.com, *.acme.io, acme.io  (dropped hackerone.com; no exclusions found)
+  recon seed: 63 hosts → recon/subdomains.txt
+  brief: header "X-HackerOne-Research: <handle>" required; no DoS/social-eng; excludes self-XSS, missing headers
+  ledger + queue initialized; Setup boxes ticked.
+CONFIRM before recon: (1) scope.txt looks right? (2) set RESEARCH_HEADER + MAX_RPS to match?
 ```
