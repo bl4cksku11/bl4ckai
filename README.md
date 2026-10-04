@@ -119,16 +119,22 @@ Seeded into each engagement's ledger per surface via `templates/technique_menu.m
 | `web-upload-handling-check` | File upload handling |
 | `web-cache-behavior-check` | Cache behavior (deception/poisoning) |
 
-### Planned — other scope verticals (populate after web)
-| Prefix | Scope |
-|---|---|
-| `mobile-*` | Mobile apps (static + dynamic) |
-| `source-*` | Source-code review |
-| `api-*` | API surface (schema, auth, rate, object refs) |
-| `cloud-*` | Cloud configuration and identity |
-| `ai-*` | ML/LLM application behavior |
-| `contract-*` | Smart-contract review |
-| `hardware-*` | Hardware/firmware |
+### Built — other scope verticals (one behavior each, neutral descriptions)
+Same pattern as web: bite-size, KB-optional, ledger-backed, confirm→dedup→draft.
+
+**mobile** — `mobile-package-inspect` (unpack+manifest/permissions/components) · `mobile-secret-scan` · `mobile-traffic-inspect` (app↔server + cert) · `mobile-storage-check` (data at rest) · `mobile-component-reach` (exported components/deep links) · `mobile-auth-token-check`
+
+**source** — `source-intake` (pin+map) · `source-dependency-audit` (advisories + reachability) · `source-input-trace` (source→sink by reading) · `source-auth-logic-review` · `source-secret-scan` (tree+history) · `source-crypto-review` · `source-query-construction-review`
+
+**api** — `api-schema-map` · `api-object-reference-walk` (BOLA) · `api-function-access-walk` (BFLA) · `api-auth-token-check` · `api-mass-assignment-check` · `api-input-validation-check`
+
+**cloud** — `cloud-storage-exposure` · `cloud-subdomain-takeover` (dangling DNS) · `cloud-identity-review` (over-broad roles) · `cloud-metadata-reach` · `cloud-exposed-service` · `cloud-secret-scan`
+
+**ai** — `ai-input-handling-check` (prompt-injection surface) · `ai-output-trust-check` · `ai-data-exposure-check` · `ai-tool-access-check` · `ai-resource-abuse-check`
+
+**contract** — `contract-intake` · `contract-access-control-review` · `contract-arithmetic-review` · `contract-external-call-order-review` (reentrancy) · `contract-oracle-review` (price manipulation) · `contract-upgrade-review` (proxy safety)
+
+**hardware** — `hardware-firmware-extract` · `hardware-firmware-secret-scan` · `hardware-interface-survey` (UART/JTAG/debug) · `hardware-service-review` · `hardware-update-integrity-review`
 
 ### Built — shared workflow skills
 | Skill | Job |

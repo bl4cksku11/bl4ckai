@@ -1,0 +1,55 @@
+---
+name: api-schema-map
+description: Enumerate an API's operations and parameters from its schema, documentation, or observed traffic, and write the map the other API checks work from.
+---
+
+# API surface map
+
+Plain name: API surface map. One thing, one skill. Work one service at a time, from the
+plan in `02_strategy.md`. Stay in scope. This skill observes and records only — it
+never drafts, submits, or contacts anyone. A confirmed result flows to `dedup-check`
+→ `finding-draft`; the operator validates and submits.
+
+## 1. Set up paths, then read any configured reference notes
+
+```bash
+: "${BL4CKAI_HOME:?set it to the harness repo root, e.g. export BL4CKAI_HOME=~/bl4ckai}"
+[ -f "$BL4CKAI_HOME/config.sh" ] && . "$BL4CKAI_HOME/config.sh"
+: "${ENGAGEMENTS_ROOT:=$BL4CKAI_HOME/engagements}"
+TARGET=acme
+LETTER=$(printf %s "$TARGET" | cut -c1 | tr '[:lower:]' '[:upper:]')
+ENG="$ENGAGEMENTS_ROOT/$LETTER/$TARGET"
+SCOPE=api.acme.com        # API host or service name
+OUT="$ENG/checks/$SCOPE"; mkdir -p "$OUT"
+[ -n "${KB_ROOT:-}" ] && echo "KB_ROOT set — read your notes relevant to this area under $KB_ROOT first." \
+  || echo "No reference library configured; use the method below + public references."
+```
+
+## 2. Collect the operations
+Pull the surface from whatever exists: an OpenAPI/Swagger doc, GraphQL introspection,
+a Postman/HAR export, or captured traffic from the app/recon. List every operation,
+method, path, and parameter, and which require auth.
+
+## 3. Write the map
+Group operations by resource and note id-bearing parameters (feeds
+`api-object-reference-walk`) and privileged operations (feeds
+`api-function-access-walk`). Carry the program header on any live request.
+
+## Record → `checks/$SCOPE/schema_map.md`
+Write one entry per item checked: what was examined, what was observed, and an
+evidence path under `$ENG/evidence/`. For anything safe, write "ruled out" with the
+reason so a later pass does not re-walk it. For anything confirmed, capture the
+proof and leave it for the operator — do not draft or submit here.
+
+## Tick the box
+Only after `schema_map.md` accounts for every item in scope for this service (confirmed
+or ruled out), tick the `API surface map` box for this service in `$ENG/00_ledger.md`.
+
+## Example of good output — `schema_map.md`
+
+```markdown
+### api.acme.com — surface — MAPPED
+OpenAPI at /v3/openapi.json → 88 operations, 12 take an {id}, 9 are admin-scoped.
+GraphQL at /graphql has introspection ON (full type map captured).
+Evidence: $ENG/checks/api.acme.com/schema_map.md
+```
