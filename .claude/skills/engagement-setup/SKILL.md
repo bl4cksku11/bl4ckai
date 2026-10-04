@@ -17,7 +17,42 @@ touches the target over the network.
 
 If the policy URL is missing, ask for it. Do not guess scope.
 
-## Steps
+## Fast path — paste-and-go (recommended)
+
+The operator rarely wants to run the steps below by hand. Instead: **paste the whole
+program dump** (policy text + the scope/asset table) into a file, and let `intake.py`
+fill the mechanical parts in one shot.
+
+```bash
+: "${BL4CKAI_HOME:?}"; [ -f "$BL4CKAI_HOME/config.sh" ] && . "$BL4CKAI_HOME/config.sh"
+# 1) save the pasted program info to a file
+$EDITOR /tmp/<slug>_dump.txt          # or: pbpaste > /tmp/<slug>_dump.txt
+# 2) one command fills everything
+python3 "$BL4CKAI_HOME/.claude/skills/engagement-setup/intake.py" \
+   <slug> /tmp/<slug>_dump.txt --program "<Name>" --platform hackerone --type vdp
+```
+
+It writes, under `$ENGAGEMENTS_ROOT/<A-Z>/<slug>/`:
+- `scope.txt` — in-scope apex wildcards + apex, auto-derived from every hostname in
+  the dump (platform/common domains like hackerone.com are filtered out).
+- `recon/subdomains.txt` — every explicit host found, so recon starts seeded.
+- `00_program_dump.txt` — the raw paste, kept as the source of truth.
+- `00_program_brief.md` — header/rate/prohibited/exclusion **hints** pulled from the
+  dump for the operator to confirm (regex never invents the scope boundary).
+- `00_ledger.md`, `_queue.json` — from the templates.
+
+Then the two human-in-the-loop confirmations it prints: **review `scope.txt`** (add
+any `-` exclusions), and **set `RESEARCH_HEADER` + `MAX_RPS`** in config to match the
+brief's hints. On HackerOne note that "Ineligible" means *no bounty*, NOT
+out-of-scope — do not exclude those hosts.
+
+When the operator asks the agent to "set up program X" and pastes the info, the
+agent runs exactly this, then refines the brief's rule summary from the dump.
+
+The steps below are the same work done by hand, for reference or when there is no
+single dump to paste.
+
+## Steps (manual / reference)
 
 ### 1. Pick the engagement path
 
