@@ -60,7 +60,7 @@ Walk the victim side: does a real victim actually suffer, or does the attacker o
 affect themselves? If no victim is harmed, it is not a finding regardless of how the
 request looks.
 
-## Verdict → `checks/<scope>/<slug>_triage.md`
+## Verdict → `reports/<slug>_triage.md`
 
 - **VALID** — all gates hold under independent check, survives the victim reading,
   score matches evidence, scope/policy clear. → proceed to `finding-draft`.
@@ -81,7 +81,7 @@ request looks.
 - Do not soften an `INVALID` because effort was spent, the code looks bad, or the
   result felt exciting. Sunk effort is not evidence.
 
-## Example of good output — `<slug>_triage.md`
+## Example of good output — `reports/<slug>_triage.md`
 
 ```markdown
 # Triage — reflected-marker-on-search — INVALID
