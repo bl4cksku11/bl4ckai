@@ -21,6 +21,9 @@ LETTER=$(printf %s "$TARGET" | cut -c1 | tr '[:lower:]' '[:upper:]')
 ENG="$ENGAGEMENTS_ROOT/$LETTER/$TARGET"
 SCOPE=com.acme.app        # package / bundle id of the in-scope app
 OUT="$ENG/checks/$SCOPE"; mkdir -p "$OUT"
+GATE="$BL4CKAI_HOME/.claude/skills/scope-gate/scope_check.sh"
+REQ="$BL4CKAI_HOME/.claude/skills/scope-gate/req.sh"
+bash "$GATE" "$SCOPE" || exit 0   # REQUIRED before any request; send live requests via "$REQ"
 [ -n "${KB_ROOT:-}" ] && echo "KB_ROOT set — read your notes relevant to this area under $KB_ROOT first." \
   || echo "No reference library configured; use the method below + public references."
 ```

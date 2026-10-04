@@ -21,11 +21,16 @@ LETTER=$(printf %s "$TARGET" | cut -c1 | tr '[:lower:]' '[:upper:]')
 ENG="$ENGAGEMENTS_ROOT/$LETTER/$TARGET"
 HOST=app.acme.com
 OUT="$ENG/checks/$HOST"; mkdir -p "$OUT"
+GATE="$BL4CKAI_HOME/.claude/skills/scope-gate/scope_check.sh"
+REQ="$BL4CKAI_HOME/.claude/skills/scope-gate/req.sh"
+bash "$GATE" "$HOST" || exit 0   # REQUIRED: OUT of scope → stop; ASK → confirm with operator
 ```
 
 If a reference library is configured (`KB_ROOT`), read its notes for this technique
 as a starting set, then adapt to what THIS target actually does. If not, rely on
-the method in this skill plus public references.
+the method in this skill plus public references. Send EVERY live request in
+this skill through `$REQ` (it enforces scope + the program header + the rate
+cap) — never raw curl; bulk tools get a scope-filtered input list and `-rl`.
 
 ```bash
 if [ -n "${KB_ROOT:-}" ] && ([ -d "$KB_ROOT/Web/Upload Insecure Files" ]); then

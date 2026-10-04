@@ -99,3 +99,18 @@ Repeater: decrementing incident_id returns another reporter's incident body (tit
 email). Baseline vs modified diff captured. Two owned accounts only.
 Evidence: $ENG/evidence/servicedesk-idor-incident.req + .resp
 ```
+
+## Scope + pacing for model-driven traffic (not just CLI)
+
+Burp replays and sent requests do NOT pass through `req.sh`, so enforce scope and
+rate at the Burp side:
+
+- **Scope**: before sending/replaying to a host, resolve it through `scope-gate`
+  (`scope_check.sh`). Keep Burp's Target > Scope aligned with `$ENG/scope.txt` so
+  out-of-scope hosts are not touched. Confirm Burp's "drop out-of-scope requests"
+  is on.
+- **Rate**: set a resource pool that caps concurrency and adds a delay, so
+  automated sending honors `MAX_RPS`/`MAX_CONCURRENCY`
+  (`mcp__burpsuite__set_project_options` → the engine/resource-pool options;
+  operator can also set it in the Burp UI). One request at a time in Repeater is
+  inherently paced; Intruder needs the pool configured before it runs.

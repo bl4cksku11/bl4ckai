@@ -108,3 +108,14 @@ Opened signed-in (operator session) in group "aegean", research header active.
 id returns that account's token record. Captured: $ENG/evidence/ssp-objref-network.json
 and a monitor replay plan $ENG/evidence/ssp-objref.plan.json. Two owned accounts only.
 ```
+
+## Scope + pacing for model-driven traffic (not just CLI)
+
+Browser-driven requests do NOT pass through `req.sh`, so enforce scope and rate at
+this layer:
+
+- **Scope**: before `open`/`act`/navigation to a host, resolve it through
+  `scope-gate`. Do not open out-of-scope origins in the managed group.
+- **Rate**: drive actions sequentially and insert a short delay between navigations
+  so the effective rate stays under `MAX_RPS`; do not fan out many tabs/requests at
+  once. Carry `RESEARCH_HEADER` via the request-override (confirm the verb).

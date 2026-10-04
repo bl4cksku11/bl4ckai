@@ -46,8 +46,10 @@ when the operator clarifies scope, update the file.
 
 ## Notes
 
-- Resolve the apex too, not just the exact label (a wildcard `*.acme.com` should
-  pass `api.acme.com`). The glob handles this.
+- `*.acme.com` matches subdomains (`api.acme.com`) but NOT the bare apex
+  `acme.com` — if the apex is in scope, add it as its own line, or it resolves ASK.
+- Precedence is deny-wins (verified): a host matching both an allow glob and a `-`
+  deny is OUT. So `*.acme.com` + `-admin.acme.com` keeps `admin.acme.com` out.
 - Out-of-scope is a first-class, recorded outcome — it is not an error. Write it to
   the check note so a later pass does not re-walk it.
 - This gate is about authorization, not reachability; a host can be in scope and

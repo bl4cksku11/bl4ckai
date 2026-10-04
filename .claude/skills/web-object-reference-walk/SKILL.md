@@ -10,9 +10,6 @@ from the surface list in `02_strategy.md`. Stay in scope. This skill tests and
 records only — it never drafts, submits, or contacts the program. A confirmed
 result is handed to the operator and the finding path.
 
-
-> **Before any request:** resolve `$HOST` through `scope-gate`, and for a cross-account/role test pull the two live sessions from `test-identity` (`identity.sh get A` / `get B`; `anon` = no auth header). A check with only one identity cannot confirm an access-control finding.
-
 ## 1. Set up paths and read any configured reference notes first
 
 ```bash
@@ -24,11 +21,16 @@ LETTER=$(printf %s "$TARGET" | cut -c1 | tr '[:lower:]' '[:upper:]')
 ENG="$ENGAGEMENTS_ROOT/$LETTER/$TARGET"
 HOST=app.acme.com
 OUT="$ENG/checks/$HOST"; mkdir -p "$OUT"
+GATE="$BL4CKAI_HOME/.claude/skills/scope-gate/scope_check.sh"
+REQ="$BL4CKAI_HOME/.claude/skills/scope-gate/req.sh"
+bash "$GATE" "$HOST" || exit 0   # REQUIRED: OUT of scope → stop; ASK → confirm with operator
 ```
 
 If a reference library is configured (`KB_ROOT`), read its notes for this technique
 as a starting set, then adapt to what THIS target actually does. If not, rely on
-the method in this skill plus public references.
+the method in this skill plus public references. Send EVERY live request in
+this skill through `$REQ` (it enforces scope + the program header + the rate
+cap) — never raw curl; bulk tools get a scope-filtered input list and `-rl`.
 
 ```bash
 if [ -n "${KB_ROOT:-}" ] && ([ -d "$KB_ROOT/Web/Insecure Direct Object References" ]); then
@@ -40,6 +42,8 @@ fi
 
 ## 2. Enumerate identifier-bearing requests with two accounts
 You need two accounts (or one account + unauthenticated). Capture every request
+
+Pull the two live sessions from `test-identity` (`A_HDR=$(bash "$BL4CKAI_HOME/.claude/skills/test-identity/identity.sh" get A)`, same for B; `anon` = no auth header) and send each request via `$REQ` with `-H "$A_HDR"`. A single identity cannot confirm an access-control finding.
 that names a record by id: path ids, query ids, body ids, and ids hidden in
 headers or tokens. Note the id format (sequential, UUID, hashed).
 

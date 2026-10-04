@@ -1,6 +1,6 @@
 ---
 name: web-asset-discovery
-description: Discover an organization's internet-facing hostnames from passive sources — certificate logs, passive datasets, ASN/IP ranges, acquisitions, and wildcards — without sending traffic to the target. Writes the host list the surface inventory works from.
+description: First recon step: discover an organization's internet-facing hostnames from passive sources (certificate logs, passive datasets, ASN/IP ranges, acquisitions, wildcards) without sending traffic. Produces the host LIST. Not for probing live services (web-recon) or finding paths (web-content-discovery).
 ---
 
 # Web asset discovery (passive)

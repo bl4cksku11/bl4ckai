@@ -10,9 +10,6 @@ plan in `02_strategy.md`. Stay in scope. This skill observes and records only �
 never drafts, submits, or contacts anyone. A confirmed result flows to `dedup-check`
 → `finding-draft`; the operator validates and submits.
 
-
-> **Before any request:** resolve `$HOST` through `scope-gate`, and for a cross-account/role test pull the two live sessions from `test-identity` (`identity.sh get A` / `get B`; `anon` = no auth header). A check with only one identity cannot confirm an access-control finding.
-
 ## 1. Set up paths, then read any configured reference notes
 
 ```bash
@@ -24,11 +21,16 @@ LETTER=$(printf %s "$TARGET" | cut -c1 | tr '[:lower:]' '[:upper:]')
 ENG="$ENGAGEMENTS_ROOT/$LETTER/$TARGET"
 SCOPE=api.acme.com        # API host or service name
 OUT="$ENG/checks/$SCOPE"; mkdir -p "$OUT"
+GATE="$BL4CKAI_HOME/.claude/skills/scope-gate/scope_check.sh"
+REQ="$BL4CKAI_HOME/.claude/skills/scope-gate/req.sh"
+bash "$GATE" "$SCOPE" || exit 0   # REQUIRED before any request; send live requests via "$REQ"
 [ -n "${KB_ROOT:-}" ] && echo "KB_ROOT set — read your notes relevant to this area under $KB_ROOT first." \
   || echo "No reference library configured; use the method below + public references."
 ```
 
 ## 2. Cross-use identifiers between two owned accounts
+
+Pull the two live sessions from `test-identity` (`A_HDR=$(bash "$BL4CKAI_HOME/.claude/skills/test-identity/identity.sh" get A)`, same for B; `anon` = no auth header) and send each request via `$REQ` with `-H "$A_HDR"`. A single identity cannot confirm an access-control finding.
 For each id-bearing operation from the surface map, replay account A's request with
 account B's identifier (and unauthenticated), keeping A's credentials. Cover path,
 query, body, and nested/batch/GraphQL node ids.

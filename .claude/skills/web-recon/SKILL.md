@@ -1,6 +1,6 @@
 ---
 name: web-recon
-description: Resolve and fingerprint the live services of already-discovered hosts for an authorized assessment, using exact commands, and write the surface inventory and plan the engagement works from.
+description: Second recon step: take an existing host list, resolve which are LIVE and fingerprint their services (status, title, technology), and write the surface inventory and plan. Not for discovering hostnames (web-asset-discovery) or crawling paths/parameters (web-content-discovery).
 ---
 
 # Web recon (surface inventory)

@@ -1,6 +1,6 @@
 ---
 name: web-content-discovery
-description: Find the paths, parameters, and client-side scripts of in-scope live hosts — from historical datasets, crawling, and directory discovery — to build the list of places later checks will look at. Active parts are scope-checked and paced.
+description: Third recon step: on hosts already known to be live, find PATHS, parameters, and client-side scripts via historical data, crawling, and directory discovery. Not for discovering hostnames (web-asset-discovery) or fingerprinting services (web-recon). Active parts are scope-checked and paced.
 ---
 
 # Web content discovery
