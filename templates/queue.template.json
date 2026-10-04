@@ -1,0 +1,23 @@
+{
+  "target": "{{TARGET}}",
+  "program": "{{PROGRAM}}",
+  "scoring": {
+    "formula": "priority_score = (impact_potential*3) + (dup_unlikely*3) + (exploitability*2) + bounty_tier_weight",
+    "bounty_tier_weight": { "critical": 20, "high": 15, "medium": 10, "low": 5, "vdp": 0 }
+  },
+  "completed": [],
+  "active": [
+    {
+      "id": "T001",
+      "task": "example task description",
+      "rationale": "the hypothesis this validates",
+      "origin": "seed | finding:T00X | inference | lesson:L00X | manual",
+      "skill": "skill-name-to-run",
+      "priority_score": 0,
+      "priority_breakdown": { "impact_potential": 0, "dup_unlikely": 0, "exploitability": 0, "bounty_tier": "vdp" },
+      "depends_on": null
+    }
+  ],
+  "flagged": [],
+  "ruled_out": []
+}

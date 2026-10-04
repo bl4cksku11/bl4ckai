@@ -1,0 +1,15 @@
+# Per-machine config (copy from config.example.sh)
+config.sh
+
+# Engagement output — never commit live target data to a shared repo
+engagements/
+
+# The original monolithic prompts carry personal handles/paths; keep them local
+# while decomposing, don't publish them.
+bug-bounty-agent.md
+vulnresearch-agent.md
+triage-agent.md
+
+# Editor / OS noise
+.DS_Store
+*.swp
