@@ -49,7 +49,7 @@ export RESEARCH_HEADER="${RESEARCH_HEADER:-}"               # program header add
 #   interceptor = model-driven signed-in browser (see browser-interactor skill)
 #   auto        = prefer burp if its MCP is reachable, else interceptor
 export WEB_BACKEND="${WEB_BACKEND:-auto}"
-export BURP_MCP_URL="${BURP_MCP_URL:-http://127.0.0.1:9876/sse}"   # Burp MCP server (BApp: "MCP Server")
+export BURP_MCP_URL="${BURP_MCP_URL:-http://127.0.0.1:9876/}"   # Burp MCP server (BApp: "MCP Server")
 
 # --- Pacing & scope (safety) -------------------------------------------------
 export MAX_RPS="${MAX_RPS:-5}"        # cap requests/sec for active jobs; programs often set rate rules

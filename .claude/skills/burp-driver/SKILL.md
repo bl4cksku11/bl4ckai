@@ -22,7 +22,7 @@ talks to it over MCP. The operator:
 1. Opens Burp Suite Pro and loads/creates the engagement **project** with the
    program's in-scope hosts added to Target > Scope.
 2. Installs the **"MCP Server"** BApp (BApp Store) and enables it; it serves at
-   `BURP_MCP_URL` (default `http://127.0.0.1:9876/sse`).
+   `BURP_MCP_URL` (default `http://127.0.0.1:9876/`).
 3. Does any authenticated login in Burp's browser so sessions exist in proxy
    history for credentialed testing.
 
@@ -30,7 +30,7 @@ Register the server with the client once (idempotent), then restart the client:
 
 ```bash
 : "${BL4CKAI_HOME:?}"; [ -f "$BL4CKAI_HOME/config.sh" ] && . "$BL4CKAI_HOME/config.sh"
-claude mcp add --transport sse --scope user burpsuite "${BURP_MCP_URL:-http://127.0.0.1:9876/sse}"
+claude mcp add --transport sse --scope project burpsuite "${BURP_MCP_URL:-http://127.0.0.1:9876/}"
 claude mcp list | grep -i burpsuite     # ✔ Connected once Burp + the MCP extension are running
 ```
 

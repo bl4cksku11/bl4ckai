@@ -90,7 +90,7 @@ Authenticated web testing uses one of two backends, chosen by `WEB_BACKEND`:
 
 - **Burp Suite Pro** (`WEB_BACKEND=burp`): operator installs Burp + the "MCP Server"
   BApp; register it once with
-  `claude mcp add --transport sse --scope user burpsuite "$BURP_MCP_URL"`.
+  `claude mcp add --transport sse --scope project burpsuite "$BURP_MCP_URL"`.
   Connects when Burp is running. See the `burp-driver` skill.
 - **Interceptor** (`WEB_BACKEND=interceptor`): run `install.sh interceptor` (clones,
   builds with Bun, registers its MCP, adopts skills). Operator loads the browser
