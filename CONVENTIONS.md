@@ -231,3 +231,12 @@ and parallelism; skills pass them to their tools (`-rl $MAX_RPS -c $MAX_CONCURRE
 for the ProjectDiscovery suite, equivalents elsewhere), and long active scans run
 through `job-runner` so the operator can see and stop them. Carry `RESEARCH_HEADER`
 on all live traffic. When a program states a rate limit, it wins over `MAX_RPS`.
+
+## 14. Evidence capture — one fixed layout
+
+Proof lives in `$ENG/evidence/` with predictable names so a draft and a retest can
+find it: `<slug>.req` / `<slug>.resp` (the request/response pair), `<slug>.png`
+(screenshot), `<slug>.har` (a full session when useful), `<slug>_oob.log` (callback
+proof). A check note and a finding reference evidence by full path. Capture the
+proof at the moment of confirmation — not reconstructed later — and keep it to what
+demonstrates the issue on owned accounts.

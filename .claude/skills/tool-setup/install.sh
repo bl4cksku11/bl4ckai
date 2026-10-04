@@ -40,6 +40,7 @@ go_pkg(){ case "$1" in
   govulncheck) echo golang.org/x/vuln/cmd/govulncheck;;
   gosec)       echo github.com/securego/gosec/v2/cmd/gosec;;
   staticcheck) echo honnef.co/go/tools/cmd/staticcheck;;
+  interactsh-client) echo github.com/projectdiscovery/interactsh/cmd/interactsh-client;;
   *) echo "";; esac; }
 
 apt_pkg(){ case "$1" in                    # tools best taken from apt
@@ -54,7 +55,7 @@ pipx_pkg(){ case "$1" in                   # python tools
 
 # ---- sets ------------------------------------------------------------------
 set_tools(){ case "$1" in
-  core)     echo "go:subfinder go:httpx go:dnsx go:katana go:gau go:waybackurls go:nuclei go:ffuf pipx:wafw00f apt:nmap";;
+  core)     echo "go:subfinder go:httpx go:dnsx go:katana go:gau go:waybackurls go:nuclei go:ffuf go:interactsh-client pipx:wafw00f apt:nmap";;
   web-full) echo "$(set_tools core) go:naabu go:assetfinder go:qsreplace go:unfurl go:gf go:hakrawler go:dalfox go:gowitness pipx:arjun apt:whatweb apt:nikto apt:sqlmap";;
   review)   echo "pipx:semgrep go:gitleaks go:osv-scanner go:govulncheck go:gosec go:staticcheck apt:ripgrep apt:cloc";;
   fuzzing)  echo "apt:afl++ apt:honggfuzz apt:radare2";;

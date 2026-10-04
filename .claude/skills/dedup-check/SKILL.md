@@ -23,6 +23,12 @@ SLUG=idor-orders-cross-account        # short finding slug
 
 ## 1. Self-duplicate — the operator's own history first
 
+If `disclosure-intake` ran, grep its corpus first — it is the assembled prior art:
+```bash
+grep -i "<class/endpoint keywords>" "$ENG/prior_art/index.txt" 2>/dev/null
+```
+
+
 - This engagement: read `$ENG/reports/` for a near-match already drafted or
   submitted on this program.
   ```bash

@@ -55,3 +55,9 @@ export BURP_MCP_URL="${BURP_MCP_URL:-http://127.0.0.1:9876/sse}"   # Burp MCP se
 export MAX_RPS="${MAX_RPS:-5}"        # cap requests/sec for active jobs; programs often set rate rules
 export MAX_CONCURRENCY="${MAX_CONCURRENCY:-10}"
 # Scope is captured per engagement in $ENG/scope.txt (patterns: plain=in-scope, '-'=out).
+
+# --- Out-of-band (blind-bug) callback backend ---------------------------------
+# For blind SSRF/XXE/command checks. "interactsh" works with any web backend;
+# Burp users may prefer Collaborator (burp-driver handles that natively).
+export OOB_BACKEND="${OOB_BACKEND:-interactsh}"   # interactsh | collaborator
+export OOB_SERVER="${OOB_SERVER:-oast.pro}"        # interactsh server (self-host for privacy)

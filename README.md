@@ -123,6 +123,13 @@ Seeded into each engagement's ledger per surface via `templates/technique_menu.m
 | `web-upload-handling-check` | File upload handling |
 | `web-cache-behavior-check` | Cache behavior (deception/poisoning) |
 
+### Built — review-driven additions (safety, correctness, income, continuity)
+- **Recon split** (web-recon was doing too much): `web-asset-discovery` (passive host discovery) · `web-recon` (live surface inventory + plan) · `web-content-discovery` (endpoints/params/scripts).
+- **Safety/correctness**: `scope-gate` (authorization gate, CONVENTIONS §12) · `test-identity` (A/B/anon/admin live sessions) · pacing (`MAX_RPS`, §13) · `oob-listener` (interactsh/Collaborator, blind-bug callbacks for both web backends).
+- **Income**: `known-cve-check` (n-day) · `js-analysis` (JS endpoints+secrets) · `graphql-probe` · `impact-escalation` (demonstrate ceiling + chain).
+- **Continuity & loop-closing**: `asset-monitor` (recon diff) · `disclosure-intake` (prior-art corpus for dedup) · `retest` (confirm fixes).
+- Evidence layout standardized (§14); `finding-draft` scores CVSS explicitly from `impact-escalation`.
+
 ### Built — other scope verticals (one behavior each, neutral descriptions)
 Same pattern as web: bite-size, KB-optional, ledger-backed, confirm→dedup→draft.
 

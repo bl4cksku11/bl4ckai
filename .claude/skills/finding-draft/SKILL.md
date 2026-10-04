@@ -26,6 +26,12 @@ VAULT="${VAULT_ROOT:+$VAULT_ROOT/$TYPE/$PROGRAM}"   # empty if no vault configur
 
 ## 1. Gather the source material
 
+If `impact-escalation` produced `<slug>_impact.md`, use it for the Impact and
+Severity sections — it already found the demonstrated ceiling and any chain. Score
+Severity explicitly with a CVSS 3.1 vector that matches what the evidence shows
+(not what is imaginable). Evidence is referenced by full path per CONVENTIONS §14.
+
+
 Pull everything the draft must be built from — do not re-test, use what is recorded:
 
 ```bash
